@@ -1,5 +1,5 @@
 /**
- * Copyright (C) Alexandros Evangelidis.
+ * Copyright (C) 2018-2020 Alexandros Evangelidis.
  * 
  * VerFilter
  * 

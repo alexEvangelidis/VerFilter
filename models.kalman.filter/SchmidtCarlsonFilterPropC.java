@@ -1,7 +1,7 @@
 /**
  * Copyright 2001-2019 The Apache Software Foundation
  * 
- * Modifications copyright (C) 2019 Alexandros Evangelidis.
+ * Modifications copyright (C) 2019-2020 Alexandros Evangelidis.
  * 
  * VerFilter
  * 
