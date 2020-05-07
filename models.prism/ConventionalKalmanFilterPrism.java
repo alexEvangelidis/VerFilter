@@ -1,22 +1,20 @@
 /**
-Copyright (C) Alexandros Evangelidis.
-
- VerFilter
-
- This file is part of VerFilter.
-
- VerFilter is free software: you can redistribute it and/or modify it
- under the terms of the GNU General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- VerFilter is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
- FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- more details.
-
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) Alexandros Evangelidis.
+ * 
+ * VerFilter
+ * 
+ * This file is part of VerFilter.
+ * 
+ * VerFilter is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * VerFilter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package models.prism;
@@ -70,10 +68,10 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 	boolean observable, controllable;
 	private State state;
 
-	public ConventionalKalmanFilterPrism(int gLevel, int decPlaces, NormalDistribution sim_proc_noise,
-			NormalDistribution measNoise, DefaultProcessModel pm, MeasurementModel mm, int max_time)
-					throws PrismException, IllegalArgumentException, IllegalStateException, InterruptedException,
-					ExecutionException {
+	public ConventionalKalmanFilterPrism(int gLevel, int decPlaces,
+			NormalDistribution sim_proc_noise, NormalDistribution measNoise, DefaultProcessModel pm,
+			MeasurementModel mm, int max_time) throws PrismException, IllegalArgumentException,
+			IllegalStateException, InterruptedException, ExecutionException {
 		this.pm = pm;
 		this.mm = mm;
 		this.gLevel = gLevel;
@@ -136,14 +134,17 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 
 	@Override
 	public List<Type> getVarTypes() {
-		return Arrays.asList(TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
-				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance());
+		return Arrays.asList(TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance(), TypeInt.getInstance(),
+				TypeInt.getInstance(), TypeInt.getInstance());
 	}
 
 	@Override
@@ -168,22 +169,22 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		state.varValues[1] = 0; // t
 		state.varValues[2] = 0; // z_s_int
 		state.varValues[3] = 0; // z_s_frac
-		state.varValues[4] = Computations.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 0),
-				decPlaces);
-		state.varValues[5] = Computations.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 0),
-				decPlaces); // P_11
-		state.varValues[6] = Computations.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 1),
-				decPlaces);
-		state.varValues[7] = Computations.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 1),
-				decPlaces); // P_12
-		state.varValues[8] = Computations.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 0),
-				decPlaces);
-		state.varValues[9] = Computations.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 0),
-				decPlaces); // P_21
-		state.varValues[10] = Computations.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 1),
-				decPlaces);
-		state.varValues[11] = Computations.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 1),
-				decPlaces);// P_22
+		state.varValues[4] = Computations
+				.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 0), decPlaces);
+		state.varValues[5] = Computations
+				.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 0), decPlaces); // P_11
+		state.varValues[6] = Computations
+				.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 1), decPlaces);
+		state.varValues[7] = Computations
+				.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(0, 1), decPlaces); // P_12
+		state.varValues[8] = Computations
+				.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 0), decPlaces);
+		state.varValues[9] = Computations
+				.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 0), decPlaces); // P_21
+		state.varValues[10] = Computations
+				.getIntegralPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 1), decPlaces);
+		state.varValues[11] = Computations
+				.getFractionalPartAsInt(pm.getInitialErrorCovariance().getEntry(1, 1), decPlaces);// P_22
 		state.varValues[12] = 0;
 		state.varValues[13] = 0; // x_11
 		state.varValues[14] = 0;
@@ -233,7 +234,8 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 	@Override
 	public double getTransitionProbability(int i, int offset) throws PrismException {
 
-		double[] probs = Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces);
+		double[] probs =
+				Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces);
 		if (gLevel == 2) {
 			return (t == max_time) ? 1.0 : (offset == 0 ? probs[0] : probs[2]);
 		} else if (gLevel == 3) {
@@ -293,22 +295,31 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		State explore = getExploreState();
 
 		RealVector x = new ArrayRealVector(new double[] {
-				((int) explore.varValues[12] + (((int) explore.varValues[13] / Math.pow(10, decPlaces)))),
-				((int) explore.varValues[14] + ((int) explore.varValues[15] / Math.pow(10, decPlaces))) });
+				((int) explore.varValues[12]
+						+ (((int) explore.varValues[13] / Math.pow(10, decPlaces)))),
+				((int) explore.varValues[14]
+						+ ((int) explore.varValues[15] / Math.pow(10, decPlaces)))});
 
-		RealMatrix P = new Array2DRowRealMatrix(new double[][] {
-			{ (int) explore.varValues[4] + ((int) explore.varValues[5] / Math.pow(10, decPlaces)),
-				(int) explore.varValues[6] + ((int) explore.varValues[7] / Math.pow(10, decPlaces)) },
-			{ (int) explore.varValues[8] + ((int) explore.varValues[9] / Math.pow(10, decPlaces)),
-					(int) explore.varValues[10] + ((int) explore.varValues[11] / Math.pow(10, decPlaces)) } });
+		RealMatrix P = new Array2DRowRealMatrix(new double[][] {{
+				(int) explore.varValues[4] + ((int) explore.varValues[5] / Math.pow(10, decPlaces)),
+				(int) explore.varValues[6]
+						+ ((int) explore.varValues[7] / Math.pow(10, decPlaces))},
+				{(int) explore.varValues[8]
+						+ ((int) explore.varValues[9] / Math.pow(10, decPlaces)),
+						(int) explore.varValues[10]
+								+ ((int) explore.varValues[11] / Math.pow(10, decPlaces))}});
 
-		RealVector xEntries = new ArrayRealVector(
-				new double[] { (int) explore.varValues[16] + ((int) explore.varValues[17] / (Math.pow(10, decPlaces))),
-						(int) explore.varValues[18] + ((int) explore.varValues[19] / Math.pow(10, decPlaces)) });
+		RealVector xEntries = new ArrayRealVector(new double[] {
+				(int) explore.varValues[16]
+						+ ((int) explore.varValues[17] / (Math.pow(10, decPlaces))),
+				(int) explore.varValues[18]
+						+ ((int) explore.varValues[19] / Math.pow(10, decPlaces))});
 
 		RealVector wEntries = new ArrayRealVector(new double[] {
-				(int) explore.varValues[20] + ((int) explore.varValues[21] / (Math.pow(10, decPlaces)) * 0.5),
-				(int) explore.varValues[20] + ((int) explore.varValues[21] / (Math.pow(10, decPlaces)) * 1) });
+				(int) explore.varValues[20]
+						+ ((int) explore.varValues[21] / (Math.pow(10, decPlaces)) * 0.5),
+				(int) explore.varValues[20]
+						+ ((int) explore.varValues[21] / (Math.pow(10, decPlaces)) * 1)});
 
 		// RealVector wEntries = new ArrayRealVector(
 		// new double[] { (int) explore.varValues[20] + ((int) explore.varValues[21] /
@@ -331,8 +342,8 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		int x_21_f_sim_1 = Computations.getFractionalPartAsInt(x_sim.getEntry(1), decPlaces);
 
 		// Measurement emitted from simulation model
-		RealVector vEntries = new ArrayRealVector(
-				new double[] { (int) explore.varValues[22] + ((int) explore.varValues[23] / Math.pow(10, decPlaces)) });
+		RealVector vEntries = new ArrayRealVector(new double[] {(int) explore.varValues[22]
+				+ ((int) explore.varValues[23] / Math.pow(10, decPlaces))});
 
 		RealVector z_sim = mm.getMeasurementMatrix().operate(x_sim).add(vEntries);
 		pm.setInitialStateEstimateVector(x);
@@ -345,8 +356,10 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		} catch (Exception e) {
 		}
 
-		int innov_int_11 = Computations.getIntegralPartAsInt(kf.getInnovation().getEntry(0), decPlaces);
-		int innov_frac_11 = Computations.getFractionalPartAsInt(kf.getInnovation().getEntry(0), decPlaces);
+		int innov_int_11 =
+				Computations.getIntegralPartAsInt(kf.getInnovation().getEntry(0), decPlaces);
+		int innov_frac_11 =
+				Computations.getFractionalPartAsInt(kf.getInnovation().getEntry(0), decPlaces);
 
 		// Set this always to zero for now; does not affect the current examples.
 		int sinv_int_11 = 0;
@@ -354,8 +367,10 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		int cond_int = 0;
 		int cond_frac = 0;
 
-		int s_int_11 = Computations.getIntegralPartAsInt(kf.getInnovationCovariance().getEntry(0, 0), decPlaces);
-		int s_frac_11 = Computations.getFractionalPartAsInt(kf.getInnovationCovariance().getEntry(0, 0), decPlaces);
+		int s_int_11 = Computations
+				.getIntegralPartAsInt(kf.getInnovationCovariance().getEntry(0, 0), decPlaces);
+		int s_frac_11 = Computations
+				.getFractionalPartAsInt(kf.getInnovationCovariance().getEntry(0, 0), decPlaces);
 
 		// -----------------------end of simulation
 
@@ -363,24 +378,32 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 		int z_sim_int_1 = Computations.getIntegralPartAsInt(z_sim.getEntry(0), decPlaces);
 		int z_sim_frac_1 = Computations.getFractionalPartAsInt(z_sim.getEntry(0), decPlaces);
 
-		int x_post_11_int = Computations.getIntegralPartAsInt(kf.getStateEstimationVector().getEntry(0), decPlaces);
-		int x_post_11_frac = Computations.getFractionalPartAsInt(kf.getStateEstimationVector().getEntry(0), decPlaces);
+		int x_post_11_int = Computations
+				.getIntegralPartAsInt(kf.getStateEstimationVector().getEntry(0), decPlaces);
+		int x_post_11_frac = Computations
+				.getFractionalPartAsInt(kf.getStateEstimationVector().getEntry(0), decPlaces);
 
-		int x_post_21_int = Computations.getIntegralPartAsInt(kf.getStateEstimationVector().getEntry(1), decPlaces);
-		int x_post_21_frac = Computations.getFractionalPartAsInt(kf.getStateEstimationVector().getEntry(1), decPlaces);
+		int x_post_21_int = Computations
+				.getIntegralPartAsInt(kf.getStateEstimationVector().getEntry(1), decPlaces);
+		int x_post_21_frac = Computations
+				.getFractionalPartAsInt(kf.getStateEstimationVector().getEntry(1), decPlaces);
 
-		int P_post_11_int = Computations.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 0), decPlaces);
-		int P_post_11_frac = Computations.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 0),
-				decPlaces);
-		int P_post_12_int = Computations.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 1), decPlaces);
-		int P_post_12_frac = Computations.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 1),
-				decPlaces);
-		int P_post_21_int = Computations.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 0), decPlaces);
-		int P_post_21_frac = Computations.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 0),
-				decPlaces);
-		int P_post_22_int = Computations.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 1), decPlaces);
-		int P_post_22_frac = Computations.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 1),
-				decPlaces);
+		int P_post_11_int = Computations
+				.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 0), decPlaces);
+		int P_post_11_frac = Computations
+				.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 0), decPlaces);
+		int P_post_12_int = Computations
+				.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 1), decPlaces);
+		int P_post_12_frac = Computations
+				.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(0, 1), decPlaces);
+		int P_post_21_int = Computations
+				.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 0), decPlaces);
+		int P_post_21_frac = Computations
+				.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 0), decPlaces);
+		int P_post_22_int = Computations
+				.getIntegralPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 1), decPlaces);
+		int P_post_22_frac = Computations
+				.getFractionalPartAsInt(kf.getErrorCovarianceMatrix().getEntry(1, 1), decPlaces);
 
 		State target = new State(exploreState);
 		if (t == max_time) {
@@ -398,18 +421,21 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 				target.setValue(18, 5);
 				target.setValue(19, x_21_f_sim_1);
 				target.setValue(20, Computations.getIntegralPartAsInt(
-						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces)[2 * offset + 1],
+						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel,
+								decPlaces)[2 * offset + 1],
 						decPlaces));
-				target.setValue(21, Computations.getFractionalPartAsInt(
-						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces)[2 * offset + 1],
-						decPlaces));
-				target.setValue(22,
-						Computations.getIntegralPartAsInt(
-								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+				target.setValue(21,
+						Computations.getFractionalPartAsInt(
+								Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel,
+										decPlaces)[2 * offset + 1],
 								decPlaces));
+				target.setValue(22, Computations.getIntegralPartAsInt(Computations
+						.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+						decPlaces));
 				target.setValue(23,
 						Computations.getFractionalPartAsInt(
-								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel,
+										decPlaces)[2 * offset + 1],
 								decPlaces));
 
 				target.setValue(24, innov_int_11);
@@ -445,18 +471,21 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 				target.setValue(18, x_21_int_sim_1);
 				target.setValue(19, x_21_f_sim_1);
 				target.setValue(20, Computations.getIntegralPartAsInt(
-						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces)[2 * offset + 1],
+						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel,
+								decPlaces)[2 * offset + 1],
 						decPlaces));
-				target.setValue(21, Computations.getFractionalPartAsInt(
-						Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel, decPlaces)[2 * offset + 1],
-						decPlaces));
-				target.setValue(22,
-						Computations.getIntegralPartAsInt(
-								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+				target.setValue(21,
+						Computations.getFractionalPartAsInt(
+								Computations.calcTransProbAndExpectedVal(sim_proc_noise, gLevel,
+										decPlaces)[2 * offset + 1],
 								decPlaces));
+				target.setValue(22, Computations.getIntegralPartAsInt(Computations
+						.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+						decPlaces));
 				target.setValue(23,
 						Computations.getFractionalPartAsInt(
-								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel, decPlaces)[2 * offset + 1],
+								Computations.calcTransProbAndExpectedVal(meas_noise, gLevel,
+										decPlaces)[2 * offset + 1],
 								decPlaces));
 
 				target.setValue(24, innov_int_11);
@@ -478,14 +507,15 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 
 	@Override
 	public boolean isLabelTrue(int i) throws PrismException {
-		RealMatrix aPostCovMatrixPRISM = new Array2DRowRealMatrix(
-				new double[][] {
-					{ (int) exploreState.varValues[4] + (int) exploreState.varValues[5] / Math.pow(10, decPlaces),
+		RealMatrix aPostCovMatrixPRISM = new Array2DRowRealMatrix(new double[][] {
+				{(int) exploreState.varValues[4]
+						+ (int) exploreState.varValues[5] / Math.pow(10, decPlaces),
 						(int) exploreState.varValues[6]
-								+ (int) exploreState.varValues[7] / Math.pow(10, decPlaces) },
-					{ (int) exploreState.varValues[8] + (int) exploreState.varValues[9] / Math.pow(10, decPlaces),
-									(int) exploreState.varValues[10]
-											+ (int) exploreState.varValues[11] / Math.pow(10, decPlaces) } });
+								+ (int) exploreState.varValues[7] / Math.pow(10, decPlaces)},
+				{(int) exploreState.varValues[8]
+						+ (int) exploreState.varValues[9] / Math.pow(10, decPlaces),
+						(int) exploreState.varValues[10]
+								+ (int) exploreState.varValues[11] / Math.pow(10, decPlaces)}});
 
 		EigenDecomposition eig = new EigenDecomposition(aPostCovMatrixPRISM);
 
@@ -511,78 +541,112 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 
 		VarList varList = new VarList();
 		try {
-			varList.addVar(new Declaration("s", new DeclarationInt(Expression.Int(0), Expression.Int(150))), 0, null);
-			varList.addVar(new Declaration("t", new DeclarationInt(Expression.Int(0), Expression.Int(max_time))), 0,
-					null);
+			varList.addVar(new Declaration("s",
+					new DeclarationInt(Expression.Int(0), Expression.Int(150))), 0, null);
+			varList.addVar(
+					new Declaration("t",
+							new DeclarationInt(Expression.Int(0), Expression.Int(max_time))),
+					0, null);
 			varList.addVar(new Declaration("z_s_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("z_s_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("P_11_int_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_11_int_f_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_12_int_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_12_int_f_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_21_int_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_21_int_f_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_22_int_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("P_22_int_f_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("x_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_11_int_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_21_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_21_int_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_11_int_sim_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_11_f_sim_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_21_int_sim_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("x_21_f_sim_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("w_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("w_11_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("v_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("v_11_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("innov_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("innov_11_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("sinv_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("sinv_11_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("s_11_int_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("s_11_f_s",
-					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(-10000), Expression.Int(Integer.MAX_VALUE))),
+					0, null);
 			varList.addVar(new Declaration("cond_11_int_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 			varList.addVar(new Declaration("cond_11_f_s",
-					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0, null);
+					new DeclarationInt(Expression.Int(0), Expression.Int(Integer.MAX_VALUE))), 0,
+					null);
 		} catch (PrismLangException e) {
 		}
 
 		return varList;
 	}
 
-	@Override
+ 	@Override
 	public int getNumTransitions(int i) throws PrismException {
 		if (gLevel == 2)
 			return (t == max_time) ? 1 : 2;
@@ -603,10 +667,12 @@ public class ConventionalKalmanFilterPrism extends DefaultModelGenerator {
 	@Override
 	public double getStateReward(int r, State state) throws PrismException {
 		RealMatrix aPostCovMatrixPRISM = new Array2DRowRealMatrix(new double[][] {
-			{ (int) state.varValues[4] + (int) state.varValues[5] / Math.pow(10, decPlaces),
-				(int) state.varValues[6] + (int) state.varValues[7] / Math.pow(10, decPlaces) },
-			{ (int) state.varValues[8] + (int) state.varValues[9] / Math.pow(10, decPlaces),
-					(int) state.varValues[10] + (int) state.varValues[11] / Math.pow(10, decPlaces) } });
+				{(int) state.varValues[4] + (int) state.varValues[5] / Math.pow(10, decPlaces),
+						(int) state.varValues[6]
+								+ (int) state.varValues[7] / Math.pow(10, decPlaces)},
+				{(int) state.varValues[8] + (int) state.varValues[9] / Math.pow(10, decPlaces),
+						(int) state.varValues[10]
+								+ (int) state.varValues[11] / Math.pow(10, decPlaces)}});
 
 		SingularValueDecomposition svd = new SingularValueDecomposition(aPostCovMatrixPRISM);
 		double cond = svd.getConditionNumber();
