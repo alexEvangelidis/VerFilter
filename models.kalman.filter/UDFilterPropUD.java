@@ -1,13 +1,12 @@
 /**
  * Copyright 2001-2019 The Apache Software Foundation
  * 
- * Modifications copyright (C) 2019-2020 Alexandros Evangelidis.
+ * Modifications copyright (C) 2018-2020 Alexandros Evangelidis.
  * 
  * VerFilter
  * 
  * The structure of this class is based upon the KalmanFilter class licensed by the ASF. In this
- * class the predict and correct methods have been rewritten to implement the Carlson-Schmidt
- * square-root filter.
+ * class the predict and correct methods have been rewritten to implement the U-D filter.
  * 
  * This file is part of VerFilter.
  * 
@@ -23,11 +22,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-package models.kalman.filter;
-
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.filter.MeasurementModel;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
@@ -38,32 +34,40 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.util.MathUtils;
 
+
 /**
- * Schmidt-Carlson algorithm is based on the based on the following book: Grewal, M.S., Andrews,
- * A.P.: Kalman Filtering: Theory and Practice with MATLAB. Wiley-IEEE Press, 4th edn. (2014). Also,
- * see Carlson's original paper: Carlson, N.A.: Fast triangular formulation
- * of the square root filter. AIAA J. 11(9), 1259–1265 (1973).
- *
- */
-public class SchmidtCarlsonFilterPropC implements KalmanFilter {
+ * U-D filter algorithm is based on the based on the following book: Grewal, M.S., Andrews,
+ * A.P.: Kalman Filtering: Theory and Practice with MATLAB. Wiley-IEEE Press, 4th edn. (2014).   
+*/
+
+public class UDFilterPropUD implements KalmanFilter {
+  /** The process model used by this filter instance. */
   private DefaultProcessModel processModel;
   /** The measurement model used by this filter instance. */
   private final MeasurementModel measurementModel;
   /** The transition matrix, equivalent to A. */
   private RealMatrix transitionMatrix;
+  /** The transposed transition matrix. */
+  private RealMatrix transitionMatrixT;
   /** The control matrix, equivalent to B. */
   private RealMatrix controlMatrix;
   /** The measurement matrix, equivalent to H. */
   private RealMatrix measurementMatrix;
+  /** The transposed measurement matrix. */
+  private RealMatrix measurementMatrixT;
   /** The internal state estimation vector, equivalent to x hat. */
   private RealVector stateEstimation;
   /** The error covariance matrix, equivalent to P. */
-  private RealMatrix C;
+  private RealMatrix U_post, D_post;
   private RealMatrix G_in;
+  RealVector innovation;
+  RealMatrix s;
+  RealMatrix s_inv;
+  static double nis;
+  RealVector sv_dot;
   private double sigma2;
-  private RealVector innovation;
-  private RealMatrix s;
-  private RealMatrix s_inv;
+  private RealMatrix D_prior, U_prior;
+
 
   /**
    * Creates a new Kalman filter with the given process and measurement models.
@@ -77,8 +81,8 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
    *         match the dimension of the initial state estimation vector
    * @throws MatrixDimensionMismatchException if the matrix dimensions do not fit together
    */
-  public SchmidtCarlsonFilterPropC(DefaultProcessModel pm, final MeasurementModel measurement,
-      RealMatrix G_in, double sigma2) throws NullArgumentException, NonSquareMatrixException,
+  public UDFilterPropUD(DefaultProcessModel pm, final MeasurementModel measurement, RealMatrix G_in,
+      double sigma2) throws NullArgumentException, NonSquareMatrixException,
       DimensionMismatchException, MatrixDimensionMismatchException {
 
     MathUtils.checkNotNull(pm);
@@ -91,7 +95,7 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
 
     transitionMatrix = processModel.getStateTransitionMatrix();
     MathUtils.checkNotNull(transitionMatrix);
-    transitionMatrix.transpose();
+    transitionMatrixT = transitionMatrix.transpose();
 
     // create an empty matrix if no control matrix was given
     if (processModel.getControlMatrix() == null) {
@@ -103,7 +107,7 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
     measurementMatrix = measurementModel.getMeasurementMatrix();
     MathUtils.checkNotNull(measurementMatrix);
 
-    measurementMatrix.transpose();
+    measurementMatrixT = measurementMatrix.transpose();
 
     // check that the process and measurement noise matrices are not null
     // they will be directly accessed from the model as they may change
@@ -126,7 +130,10 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
           stateEstimation.getDimension());
     }
 
-    C = processModel.getC();
+    // initialize the error covariance to the process noise if it is not
+    // available from the process model
+    U_post = processModel.getU();
+    D_post = processModel.getD();
 
     // sanity checks, the control matrix B may be null
 
@@ -185,7 +192,7 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
 
   /**
    * Returns the current state estimation vector.
-   *
+   * 
    * @return the state estimation vector
    */
   @Override
@@ -204,13 +211,23 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
   }
 
   /**
+   * Returns the current error covariance matrix.
+   *
+   * @return the error covariance matrix
+   */
+  @Override
+  public double[][] getErrorCovariance() {
+    return null;
+  }
+
+  /**
    * Returns a copy of the current error covariance matrix.
    *
    * @return the error covariance matrix
    */
-
-  public RealMatrix getC() {
-    return C.copy();
+  @Override
+  public RealMatrix getErrorCovarianceMatrix() {
+    return null;
   }
 
   /**
@@ -244,67 +261,46 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
     if (u != null && u.getDimension() != controlMatrix.getColumnDimension()) {
       throw new DimensionMismatchException(u.getDimension(), controlMatrix.getColumnDimension());
     }
-    RealMatrix CPin = C;
-    RealMatrix PhiCPin = transitionMatrix.multiply(CPin);
+    int nd = 2;
 
-    RealMatrix GCQ = G_in.scalarMultiply(Math.sqrt(sigma2));
+    D_prior = MatrixUtils.createRealMatrix(2, 2);
+    U_prior = MatrixUtils.createRealIdentityMatrix(2);
 
-    int rows = GCQ.getRowDimension();
-    int cols = GCQ.getColumnDimension();
-    RealMatrix w = MatrixUtils.createRealMatrix(1, 2);
-    RealMatrix v = MatrixUtils.createRealMatrix(1, 2);
-
-    for (int i = rows - 1; i > -1; i--) {
-      double ssigma2 = 0;
-
-      for (int j = 0; j < cols; j++) {
-        ssigma2 = ssigma2 + Math.pow(GCQ.getEntry(i, j), 2);
+    stateEstimation = transitionMatrix.operate(stateEstimation);
+    int n = G_in.getRowDimension();
+    int r = G_in.getColumnDimension();
+    RealMatrix G = G_in.copy();
+    RealMatrix PhiU = transitionMatrix.multiply(U_post);
+    for (int i = n - 1; i > -1; i--) {
+      double sigma = 0.0;
+      for (int j = 0; j < n; j++) {
+        sigma = sigma + Math.pow(PhiU.getEntry(i, j), 2) * D_post.getEntry(j, j);
+        if (j < r) {
+          sigma = sigma + Math.pow(G.getEntry(i, j), 2) * sigma2;
+        }
       }
 
-      for (int j = 0; j <= i; j++) {
-        ssigma2 = ssigma2 + Math.pow(PhiCPin.getEntry(i, j), 2);
-      }
+      D_prior.setEntry(i, i, sigma);
 
-      double alpha = Math.sqrt(ssigma2);
-      ssigma2 = 0;
-
-      for (int j = 0; j < cols; j++) {
-        w.setEntry(0, j, GCQ.getEntry(i, j));
-        ssigma2 = ssigma2 + Math.pow(w.getEntry(0, j), 2);
-      }
-
-      for (int j = 0; j <= i; j++) {
-
-        if (j == i) {
-          v.setEntry(0, j, PhiCPin.getEntry(i, j) - alpha);
-        } else {
-          v.setEntry(0, j, PhiCPin.getEntry(i, j));
+      for (int j = 0; j < i; j++) {
+        sigma = 0;
+        for (int k = 0; k < n; k++) {
+          sigma = sigma + PhiU.getEntry(i, k) * D_post.getEntry(k, k) * PhiU.getEntry(j, k);
         }
-        ssigma2 = ssigma2 + Math.pow(v.getEntry(0, j), 2);
-      }
-      alpha = 2. / ssigma2;
+        for (int k = 0; k < r; k++) {
+          sigma = sigma + G.getEntry(i, k) * sigma2 * G.getEntry(j, k);
+        }
+        U_prior.setEntry(j, i, sigma / D_prior.getEntry(i, i));
 
-      for (int k = 0; k <= i; k++) {
-        ssigma2 = 0;
-        for (int j = 0; j < cols; j++) {
-          ssigma2 = ssigma2 + GCQ.getEntry(k, j) * w.getEntry(0, j);
+        for (int k = 0; k < n; k++) {
+          PhiU.setEntry(j, k, PhiU.getEntry(j, k) - U_prior.getEntry(j, i) * PhiU.getEntry(i, k));
         }
-        for (int j = 0; j <= i; j++) {
-          ssigma2 = ssigma2 + PhiCPin.getEntry(k, j) * v.getEntry(0, j);
-        }
-        double beta = alpha * ssigma2;
-
-        for (int j = 0; j < cols; j++) {
-          GCQ.setEntry(k, j, GCQ.getEntry(k, j) - beta * w.getEntry(0, j));
-        }
-        for (int j = 0; j <= i; j++) {
-          PhiCPin.setEntry(k, j, PhiCPin.getEntry(k, j) - beta * v.getEntry(0, j));
+        for (int k = 0; k < r; k++) {
+          G.setEntry(j, k, G.getEntry(j, k) - U_prior.getEntry(j, i) * G.getEntry(i, k));
         }
       }
     }
-    RealMatrix CPout = PhiCPin;
-    stateEstimation = transitionMatrix.operate(stateEstimation);
-    C = CPout;
+
   }
 
   /**
@@ -332,45 +328,55 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
   @Override
   public void correct(RealVector z)
       throws NullArgumentException, DimensionMismatchException, SingularMatrixException {
+    // sanity checks
     MathUtils.checkNotNull(z);
     if (z.getDimension() != measurementMatrix.getRowDimension()) {
       throw new DimensionMismatchException(z.getDimension(), measurementMatrix.getRowDimension());
     }
+
+    RealMatrix a = U_prior.transpose().multiply(measurementMatrix.transpose());
+    RealMatrix b = D_prior.multiply(a);
+
+    U_post = U_prior.copy();
+    D_post = D_prior.copy();
+    innovation = z.subtract(measurementMatrix.operate(stateEstimation));
     double alpha = measurementModel.getMeasurementNoise().getEntry(0, 0);
-    innovation = z.copy();
-    RealMatrix w = MatrixUtils.createRealMatrix(1, 2);
+    double gamma = 1 / alpha;
+
     for (int i = 0; i < stateEstimation.getDimension(); i++) {
-      innovation.setEntry(0, innovation.getEntry(0)
-          - ((measurementMatrix.getEntry(0, i) * stateEstimation.getEntry(i))));
 
-      double ssigma2 = 0;
-      for (int j = 0; j <= i; j++) {
-        ssigma2 = ssigma2 + C.getEntry(j, i) * measurementMatrix.getEntry(0, j);
-      }
       double beta = alpha;
-      alpha = alpha + Math.pow(ssigma2, 2);
-      double gamma = Math.sqrt(alpha * beta);
-      double eta = beta / gamma;
+      alpha = alpha + a.getEntry(i, 0) * b.getEntry(i, 0);
+      double lambda = -(a.getEntry(i, 0)) * gamma;
+      gamma = 1 / alpha;
+      D_post.setEntry(i, i, beta * gamma * D_post.getEntry(i, i));
 
-      double zeta = ssigma2 / gamma;
+      for (int j = 0; j < i; j++) {
+        beta = U_post.getEntry(j, i);
 
-      w.setEntry(0, i, 0);
-
-      for (int j = 0; j <= i; j++) {
-        double tau = C.getEntry(j, i);
-        C.setEntry(j, i, eta * C.getEntry(j, i) - zeta * w.getEntry(0, j));
-        w.setEntry(0, j, w.getEntry(0, j) + tau * ssigma2);
+        U_post.setEntry(j, i, beta + b.getEntry(j, 0) * lambda);
+        b.setEntry(j, j, b.getEntry(j, 0) + b.getEntry(i, 0) * beta);
       }
     }
 
-    RealVector epsilon = innovation.mapDivide(alpha);
-    stateEstimation = stateEstimation.add(w.transpose().operate(epsilon));
+    stateEstimation = stateEstimation.add(b.operate(innovation.mapMultiply(gamma)));
+
+    RealMatrix errorCovariance = U_post.multiply(D_post).multiply(U_post.transpose());
   }
 
   @Override
   public RealVector getInnovation() {
 
     return innovation;
+  }
+
+  public RealMatrix getU() {
+    return U_post;
+
+  }
+
+  public RealMatrix getD() {
+    return D_post;
   }
 
   @Override
@@ -388,14 +394,7 @@ public class SchmidtCarlsonFilterPropC implements KalmanFilter {
     this.processModel = process;
   }
 
-  @Override
-  public double[][] getErrorCovariance() {
-    return null;
-  }
-
-  @Override
-  public RealMatrix getErrorCovarianceMatrix() {
-    return null;
+  public static double getNIS() {
+    return nis;
   }
 }
-
